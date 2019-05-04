@@ -638,8 +638,9 @@ double NEV(double x, VEC &XDATA, VEC &YDATA) {
     return NS[0];
 }
 
-void splineM(int N, VEC &X, VEC &Y, VEC &M) {
+void splineM(VEC &X, VEC &Y, VEC &M) {
     
+    int N = X.len();
     VEC h(N);
     for (int i = 1; i < N; i++) {
         h[i] = X[i] - X[i - 1];
@@ -672,8 +673,9 @@ void splineM(int N, VEC &X, VEC &Y, VEC &M) {
     M = LU_Solve(A, d); // solve M in A * M = d
 }
 
-double spline(double x, int N, VEC &X, VEC &Y, VEC &M) {
+double spline(double x, VEC &X, VEC &Y, VEC &M) {
     
+    int N = X.len();
     VEC h(N); // length of subintervals
     
     for (int i = 1; i < N; i++) {
@@ -713,9 +715,9 @@ double spline(double x, int N, VEC &X, VEC &Y, VEC &M) {
  subintervalNumber: determine the number of interpolation values will be
                     produced, should be more than the number of support points
  */
-void parametric_spline(int subintervalNumber, int N, VEC &X, VEC &Y,
+void parametric_spline(int subintervalNumber, VEC &X, VEC &Y,
                        VEC &spline_x, VEC &spline_y) {
-    
+    int N = X.len();
     VEC t(N);
     
     for (int i = 1; i < N; i++) {
@@ -725,17 +727,15 @@ void parametric_spline(int subintervalNumber, int N, VEC &X, VEC &Y,
 
     // perform cubic spline interpolation on t, x
     VEC Mx(N);
-    splineM(N, t, X, Mx);
+    splineM(t, X, Mx);
     for (int i = 0; i < subintervalNumber; i++) {
-        spline_x[i] = spline(i * t[N - 1] / (subintervalNumber - 1),
-                             N, t, X, Mx);
+        spline_x[i] = spline(i * t[N - 1] / (subintervalNumber - 1), t, X, Mx);
     }
     
     // perform cubic spline interpolation on t, y
     VEC My(N);
-    splineM(N, t, Y, My);
+    splineM(t, Y, My);
     for (int i = 0; i < subintervalNumber; i++) {
-        spline_y[i] = spline(i * t[N - 1] / (subintervalNumber - 1),
-                             N, t, Y, My);
+        spline_y[i] = spline(i * t[N - 1] / (subintervalNumber - 1), t, Y, My);
     }
 }

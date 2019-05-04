@@ -71,9 +71,9 @@ int EVqrShifted(MAT &A, double mu, double tol, int maxiter);
 double Lagrange(double x, VEC &XDATA, VEC &YDATA);
 double NEV(double x, VEC &XDATA, VEC &YDATA);
 
-void splineM(int N, VEC &X, VEC &Y, VEC &M); // generate spline momentum M
-double spline(double x, int N, VEC &X, VEC &Y, VEC &M); // spline interp at x
-void parametric_spline(int subintervalNumber, int N, VEC &X, VEC &Y,
+void splineM(VEC &X, VEC &Y, VEC &M); // generate spline momentum M
+double spline(double x, VEC &X, VEC &Y, VEC &M); // spline interp at x
+void parametric_spline(int subintervalNumber, VEC &X, VEC &Y,
                        VEC &spline_x, VEC &spline_y); // p[aratric spline interp
 
 #endif
