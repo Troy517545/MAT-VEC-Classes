@@ -31,6 +31,9 @@ public:
     void set_element(double x, int index);
     double get_element(int index) const;
     
+    void sort();
+
+    
     void print();
     void print(std::string s);
     
