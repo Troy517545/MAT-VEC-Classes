@@ -134,6 +134,17 @@ VEC *newVEC(int n) {
     return vptr;
 }
 
+VEC *newVEC(int n, double *v) {
+    VEC *vptr;
+    vptr = (VEC *)malloc(sizeof(VEC));
+    vptr->dim = n;
+    vptr->val = (double *)calloc(n, sizeof(double));
+    for (int i = 0; i < n; i++) {
+        vptr->val[i] = v[i];
+    }
+    return vptr;
+}
+
 VEC operator*(double a, const VEC v1) {
     int n = v1.len();
     VEC v2 = v1;
@@ -182,7 +193,6 @@ void merge(VEC &s, int l, int m, int r) {
         k++;
     }
 }
-
 
 void mergeSort(VEC &s, int l, int r) {
     if (l < r) {

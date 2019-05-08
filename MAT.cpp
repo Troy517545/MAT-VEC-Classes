@@ -739,3 +739,89 @@ void parametric_spline(int subintervalNumber, VEC &X, VEC &Y,
         spline_y[i] = spline(i * t[N - 1] / (subintervalNumber - 1), t, Y, My);
     }
 }
+
+
+
+/*
+ newtonCotes will calculate integration with Newton-Cotes algorithm
+ 
+ parameters:
+ int n : which order Newton-Cotes will use
+ int region_number : how many equal sized regions will it divide
+ double (*f)(double) : pass in a f function you want to find the integrate,
+ this function f need to have a double type input and output
+ double a, double b : the left and the right boundary of the integration
+ */
+double newtonCotes(int n, int region_number, double (*f)(double), double a,
+                   double b) {
+    
+    if (n == 0) {
+        double s = 0;
+        
+        VEC Y(region_number + 1);
+        double h = ((b - a) / (region_number));
+        for (int k = 0; k < region_number; k++) { // for each region
+            // I(f) = h * f((x0 + x1) /2 )
+            s += h * (*f)(a + k * (b - a) / (region_number) + 0.5 * h);
+        }
+        
+        return s;
+    }
+    
+    VEC *vptr = (VEC *)malloc(sizeof(VEC));
+    
+    switch (n) { // construct w vector
+        case 1: {
+            double temp[] = {1.0 / 2.0, 1.0 / 2.0};
+            vptr = newVEC(2, temp);
+            break;
+        }
+        case 2: {
+            double temp[] = {1.0 / 3.0, 4.0 / 3.0, 1.0 / 3.0};
+            vptr = newVEC(3, temp);
+            break;
+        }
+        case 3: {
+            double temp[] = {3.0 / 8.0, 9.0 / 8.0, 9.0 / 8.0, 3.0 / 8.0};
+            vptr = newVEC(4, temp);
+            break;
+        }
+        case 4: {
+            double temp[] = {14.0 / 45.0, 64.0 / 45.0, 24.0 / 45.0, 64.0 / 45.0,
+                14.0 / 45.0};
+            vptr = newVEC(5, temp);
+            break;
+        }
+        case 5: {
+            double temp[] = {95.0 / 288.0,  375.0 / 288.0, 250.0 / 288.0,
+                250.0 / 288.0, 375.0 / 288.0, 95.0 / 288.0};
+            vptr = newVEC(6, temp);
+            break;
+        }
+        case 6: {
+            double temp[] = {41.0 / 140.0, 216.0 / 140.0, 27.0 / 140.0, 272.0
+                / 140.0, 27.0 / 140.0, 216.0 / 140.0, 41.0 / 140.0};
+            vptr = newVEC(7, temp);
+            break;
+        }
+        default: {
+            double temp[] = {41.0 / 140.0, 216.0 / 140.0, 27.0 / 140.0, 272.0
+                / 140.0, 27.0 / 140.0, 216.0 / 140.0, 41.0 / 140.0};
+            vptr = newVEC(7, temp);
+        }
+    }
+    
+    VEC w = (*vptr);
+    
+    double s = 0;
+    
+    double h = ((b - a) / (region_number)) / n;
+    for (int k = 0; k < region_number; k++) { // for each region
+        // I(f) = h * (w0 * f(x0) + w1 * f(x1) + ... + wn * f(xn))
+        for (int i = 0; i <= n; i++) { // for each n order
+            s += h * w[i] * (*f)(a + k * (b - a) / (region_number) + i * h);
+        }
+    }
+    
+    return s;
+}

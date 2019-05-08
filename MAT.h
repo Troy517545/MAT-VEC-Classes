@@ -76,4 +76,6 @@ double spline(double x, VEC &X, VEC &Y, VEC &M); // spline interp at x
 void parametric_spline(int subintervalNumber, VEC &X, VEC &Y,
                        VEC &spline_x, VEC &spline_y); // p[aratric spline interp
 
+double newtonCotes(int n, int region_number, double (*f)(double),
+                   double a, double b);
 #endif

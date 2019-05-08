@@ -27,6 +27,8 @@ public:
     double &operator[](int n);     // indexing
     friend VEC operator*(double a, const VEC v1); // dbl x V
     friend VEC *newVEC(int n);                    // create dynamic VEC
+    friend VEC *newVEC(int n, double *v);
+
     
     void set_element(double x, int index);
     double get_element(int index) const;
@@ -44,6 +46,8 @@ private:
 
 VEC operator*(double a, const VEC v1);
 VEC *newVEC(int n); // create dynamic VEC
+VEC *newVEC(int n, double *v); // create dynamic VEC
+
 
 double Lp_norm(VEC v, double p);         // return Lp-norm of v
 double p_norm(VEC v1, VEC v2, double p); // return p-norm of v1 and v2
