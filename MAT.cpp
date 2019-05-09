@@ -681,14 +681,7 @@ double spline(double x, VEC &X, VEC &Y, VEC &M) {
     for (int i = 1; i < N; i++) {
         h[i] = X[i] - X[i - 1];
     }
-    
-    VEC A(N);
-    VEC B(N);
-    
-    for (int i = 1; i < N; i++) { // construct A and B
-        B[i] = Y[i - 1] - M[i - 1] * h[i] * h[i] / 6;
-        A[i] = (Y[i] - Y[i - 1]) / h[i] - h[i] * (M[i] - M[i - 1]) / 6;
-    }
+
     
     int i = 1;
     while (i < N) { // find which subinterval x is in
@@ -698,10 +691,14 @@ double spline(double x, VEC &X, VEC &Y, VEC &M) {
         i++;
     }
     
-    // caculate s, which is the spline interpolation value at x
+    double A, B;
+    B = Y[i - 1] - M[i - 1] * h[i] * h[i] / 6;
+    A = (Y[i] - Y[i - 1]) / h[i] - h[i] * (M[i] - M[i - 1]) / 6;
+    
+    // calculate s, which is the spline interpolation value at x
     double s = M[i - 1] * pow(X[i] - x, 3) / (6 * h[i]) +
-    M[i] * pow(x - X[i - 1], 3) / (6 * h[i]) + A[i] * (x - X[i - 1]) +
-    B[i];
+    M[i] * pow(x - X[i - 1], 3) / (6 * h[i]) + A * (x - X[i - 1]) +
+    B;
     
     return s;
 }
