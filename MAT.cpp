@@ -195,7 +195,8 @@ MAT &cholesky(MAT &A) {
                 s += (*L)[i][k] * (*L)[j][k];
             }
             (*L)[i][j] =
-            (i == j) ? sqrt(A[i][i] - s) : (1.0 / ((*L)[j][j]) * (A[i][j] - s));
+                (i == j) ?
+                    sqrt(A[i][i] - s) : (1.0 / ((*L)[j][j]) * (A[i][j] - s));
         }
     }
     
@@ -353,8 +354,8 @@ int cg(MAT &A, VEC b, VEC &x, int maxIter, double tol) {
     double alpha = 0, beta = 0, error = 0;
     
     for (iter = 1; iter <= maxIter; iter++) { // loop with each iteration
-        VEC temp1 = A * p;                      // only need to calculate p*A once
-        double temp2 = temp1 * p;               // only need to calculate p*A*p once
+        VEC temp1 = A * p;                  // only need to calculate p*A once
+        double temp2 = temp1 * p;           // only need to calculate p*A*p once
         alpha = (p * r) / temp2;
         x += p * alpha;
         r -= temp1 * alpha;
@@ -632,15 +633,15 @@ double NEV(double x, VEC &XDATA, VEC &YDATA) {
     for (int k = 1; k < n; k++) {
         for (int j = 0; j < n - k; j++) {
             NS[j] = ((x - XDATA[j]) * NS[j + 1] - (x - XDATA[k + j]) * NS[j]) /
-            (XDATA[j + k] - XDATA[j]);
+                (XDATA[j + k] - XDATA[j]);
         }
     }
     return NS[0];
 }
 
-void splineM(VEC &X, VEC &Y, VEC &M) {
+
+void splineM(int N, VEC &X, VEC &Y, VEC &M) {
     
-    int N = X.len();
     VEC h(N);
     for (int i = 1; i < N; i++) {
         h[i] = X[i] - X[i - 1];
@@ -654,7 +655,7 @@ void splineM(VEC &X, VEC &Y, VEC &M) {
         mu[i] = h[i] / (h[i] + h[i + 1]);
         lambda[i] = h[i + 1] / (h[i] + h[i + 1]);
         d[i] = (6 / (h[i] + h[i + 1])) *
-        (((Y[i + 1] - Y[i]) / h[i + 1]) - ((Y[i] - Y[i - 1]) / h[i]));
+            (((Y[i + 1] - Y[i]) / h[i + 1]) - ((Y[i] - Y[i - 1]) / h[i]));
     }
     lambda[0] = 0;
     d[0] = 0; // use zero boundary
@@ -673,15 +674,14 @@ void splineM(VEC &X, VEC &Y, VEC &M) {
     M = LU_Solve(A, d); // solve M in A * M = d
 }
 
-double spline(double x, VEC &X, VEC &Y, VEC &M) {
+double spline(double x, int N, VEC &X, VEC &Y, VEC &M) {
     
-    int N = X.len();
     VEC h(N); // length of subintervals
     
     for (int i = 1; i < N; i++) {
         h[i] = X[i] - X[i - 1];
     }
-
+    
     
     int i = 1;
     while (i < N) { // find which subinterval x is in
@@ -704,50 +704,51 @@ double spline(double x, VEC &X, VEC &Y, VEC &M) {
 }
 
 /*
- perform parametrix spline interpolation
- X and Y: input sopport points
- N: number of soupport points
+ perform Parametric spline interpolation
+ X and Y: input support points
+ N: number of support points
  spline_x and spline_y: will store the result of spline interpolation values
                         into them
  subintervalNumber: determine the number of interpolation values will be
                     produced, should be more than the number of support points
  */
-void parametric_spline(int subintervalNumber, VEC &X, VEC &Y,
+void parametric_spline(int subintervalNumber, int N, VEC &X, VEC &Y,
                        VEC &spline_x, VEC &spline_y) {
-    int N = X.len();
+    
     VEC t(N);
     
     for (int i = 1; i < N; i++) {
         t[i] = t[i - 1] +
-        sqrt(pow(X[i] - X[i - 1], 2) + pow(Y[i] - Y[i - 1], 2));
+            sqrt(pow(X[i] - X[i - 1], 2) + pow(Y[i] - Y[i - 1], 2));
     }
 
     // perform cubic spline interpolation on t, x
     VEC Mx(N);
-    splineM(t, X, Mx);
+    splineM(N, t, X, Mx);
     for (int i = 0; i < subintervalNumber; i++) {
-        spline_x[i] = spline(i * t[N - 1] / (subintervalNumber - 1), t, X, Mx);
+        spline_x[i] = spline(i * t[N - 1] / (subintervalNumber - 1),
+                             N, t, X, Mx);
     }
     
     // perform cubic spline interpolation on t, y
     VEC My(N);
-    splineM(t, Y, My);
+    splineM(N, t, Y, My);
     for (int i = 0; i < subintervalNumber; i++) {
-        spline_y[i] = spline(i * t[N - 1] / (subintervalNumber - 1), t, Y, My);
+        spline_y[i] = spline(i * t[N - 1] / (subintervalNumber - 1),
+                             N, t, Y, My);
     }
 }
-
 
 
 /*
  newtonCotes will calculate integration with Newton-Cotes algorithm
  
  parameters:
- int n : which order Newton-Cotes will use
- int region_number : how many equal sized regions will it divide
- double (*f)(double) : pass in a f function you want to find the integrate,
- this function f need to have a double type input and output
- double a, double b : the left and the right boundary of the integration
+    int n : which order Newton-Cotes will use
+    int region_number : how many equal sized regions will it divide
+    double (*f)(double) : pass in a f function you want to find the integrate,
+        this function f need to have a double type input and output
+    double a, double b : the left and the right boundary of the integration
  */
 double newtonCotes(int n, int region_number, double (*f)(double), double a,
                    double b) {
@@ -821,4 +822,153 @@ double newtonCotes(int n, int region_number, double (*f)(double), double a,
     }
     
     return s;
+}
+
+double Bisection(double (*f)(double), double a, double b, double e) {
+    
+    if ((*f)(a) * (*f)(b) > 0) {
+        return std::numeric_limits<double>::quiet_NaN();
+        ;
+    }
+    
+    double x;
+    
+    x = (a + b) / 2;
+    
+    while (fabs(x - a) > e) {
+        if ((*f)(x) * (*f)(a) <= 0) {
+            b = x;
+        } else {
+            a = x;
+        }
+        x = (a + b) / 2;
+    }
+    return x;
+}
+
+double Chord(double (*f)(double), double a, double b, double e) {
+    
+    if ((*f)(a) * (*f)(b) > 0) {
+        return std::numeric_limits<double>::quiet_NaN();
+        ;
+    }
+    
+    double g = ((*f)(b) - (*f)(a)) / (b - a);
+    double x = b;
+    double err = 1 + e;
+    
+    while (err > e) {
+        x = x - (*f)(x) / g;
+        err = fabs((*f)(x));
+    }
+    
+    return x;
+}
+
+double RegulaFalsi(double (*f)(double), double a, double b, double e) {
+    
+    if((*f)(a) * (*f)(b) > 0) {
+        return std::numeric_limits<double>::quiet_NaN();;
+    }
+    
+    double x = 0;
+    double err = 1 + e;
+    while (err > e) {
+        x = a - (*f)(a) * (b - a) / ((*f)(b) - (*f)(a));
+        if ((*f)(x) * (*f)(a) <= 0) {
+            b = x;
+        } else {
+            a = x;
+        }
+        err = fabs((*f)(x));
+    }
+    return x;
+}
+
+double Secant(double (*f)(double), double x_prev, double x, double e) {
+    double err = 1 + e;
+    double x_next;
+    while (err > e) {
+        x_next = x - (*f)(x) * (x - x_prev) / ((*f)(x) - (*f)(x_prev));
+        x_prev = x;
+        x = x_next;
+        err = fabs((*f)(x));
+    }
+    return x_prev;
+}
+
+double Newtons(double (*f)(double), double (*f_1d)(double), double x,
+               double e) {
+    double err = 1 + e;
+    while (err > e) {
+        x = x - ((*f)(x) / (*f_1d)(x));
+        err = fabs((*f)(x));
+    }
+    
+    return x;
+}
+
+double NewtonsStepLimiting(double (*f)(double), double (*fprime)(double),
+                           double x, double S, double e) {
+    double err = 1 + e;
+    double x_next;
+    while (err > e) {
+        x_next = x - ((*f)(x) / (*fprime)(x));
+        if (x_next > x + S) {
+            x_next = x + S;
+        } else if (x_next < x - S) {
+            x_next = x - S;
+        }
+        x = x_next;
+        err = fabs((*f)(x));
+    }
+    
+    return x;
+}
+
+VEC PolynomialRoots(VEC a, double x0, double e, int maxiter) {
+    int n = a.len() - 1;
+    double err, k, b_m1, c_m1, x;
+    VEC b(n + 1);
+    VEC c(n + 1);
+    VEC z(n);
+    
+    while (n >= 1) {
+        err = 1 + e;
+        k = 0;
+        x = x0;
+        
+        while (err >= e && k < maxiter) {
+            b[n - 1] = a[n];
+            c_m1 = b[0]; // deal with the situation when n=1
+            c[n - 2] = b[n - 1];
+            
+            for (int j = n - 2; j >= 0; j--) {
+                b[j] = a[j + 1] + x * b[j + 1];
+            }
+            for (int j = n - 3; j >= 0; j--) {
+                c[j] = b[j + 1] + x * c[j + 1];
+            }
+            
+            b_m1 = a[0] + x * b[0];
+            if (n != 1) { // deal with the situation when n=1
+                c_m1 = b[0] + x * c[0];
+            }
+            
+            x = x - b_m1 / c_m1;
+            err = fabs(b_m1);
+            k++;
+        }
+        
+        z[n - 1] = x;
+        
+        for (int j = 0; j < n; j++) {
+            a[j] = b[j];
+        }
+        
+        x0 = z[n - 1] + pow(10, -3); // add a little bias to x0
+        n--;
+    }
+    
+    return z;
 }

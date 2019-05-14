@@ -1,4 +1,5 @@
 
+
 // vector class
 #ifndef VEC_H
 #define VEC_H
@@ -27,13 +28,8 @@ public:
     double &operator[](int n);     // indexing
     friend VEC operator*(double a, const VEC v1); // dbl x V
     friend VEC *newVEC(int n);                    // create dynamic VEC
-    friend VEC *newVEC(int n, double *v);
-
-    
-    void set_element(double x, int index);
-    double get_element(int index) const;
-    
-    void sort();
+    friend VEC *newVEC(int n, double *v);         
+    double* asarray(int& n);
 
     
     void print();
@@ -45,6 +41,7 @@ private:
 };
 
 VEC operator*(double a, const VEC v1);
+
 VEC *newVEC(int n); // create dynamic VEC
 VEC *newVEC(int n, double *v); // create dynamic VEC
 

@@ -1,4 +1,5 @@
 
+
 // matrix class
 #ifndef MAT_H
 #define MAT_H
@@ -71,11 +72,25 @@ int EVqrShifted(MAT &A, double mu, double tol, int maxiter);
 double Lagrange(double x, VEC &XDATA, VEC &YDATA);
 double NEV(double x, VEC &XDATA, VEC &YDATA);
 
-void splineM(VEC &X, VEC &Y, VEC &M); // generate spline momentum M
-double spline(double x, VEC &X, VEC &Y, VEC &M); // spline interp at x
-void parametric_spline(int subintervalNumber, VEC &X, VEC &Y,
+void splineM(int N, VEC &X, VEC &Y, VEC &M); // generate spline momentum M
+double spline(double x, int N, VEC &X, VEC &Y, VEC &M); // spline interp at x
+void parametric_spline(int subintervalNumber, int N, VEC &X, VEC &Y,
                        VEC &spline_x, VEC &spline_y); // p[aratric spline interp
 
 double newtonCotes(int n, int region_number, double (*f)(double),
                    double a, double b);
+
+double Bisection(double (*f)(double), double a, double b, double e);
+
+double Chord(double (*f)(double), double a, double b, double e);
+
+double RegulaFalsi(double (*f)(double), double a, double b, double e);
+
+double Secant(double (*f)(double), double x_prev, double x, double e);
+
+double Newtons(double (*f)(double), double (*f_1d)(double), double x, double e);
+
+double NewtonsStepLimiting(double (*f)(double), double (*fprime)(double), double x, double S, double e);
+
+VEC PolynomialRoots(VEC a, double x0, double e, int maxiter);
 #endif
